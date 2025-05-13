@@ -1,0 +1,28 @@
+name: Deploy Supabase to Fly.io
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Fly.io CLI
+      run: |
+        curl -L https://fly.io/install.sh | sh
+        export FLYCTL_INSTALL="/home/runner/.fly"
+        export PATH="$FLYCTL_INSTALL/bin:$PATH"
+
+    - name: Fly.io Auth
+      run: fly auth login --access-token ${{ secrets.FLY_ACCESS_TOKEN }}
+
+    - name: Deploy Supabase on Fly.io
+      run: |
+        fly launch --name supabase-app --region fra
+        fly deploy
